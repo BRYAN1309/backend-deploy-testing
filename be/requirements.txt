@@ -4,3 +4,4 @@ python-dotenv
 supabase
 flask-jwt-extended
 pydantic-settings
+gunicorn

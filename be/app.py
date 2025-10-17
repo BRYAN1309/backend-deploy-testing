@@ -46,10 +46,17 @@ def register():
         if not email or not password:
             return jsonify({"error": "Email and password are required"}), 400
 
+        # Validasi email sederhana
+        if "@" not in email:
+            return jsonify({"error": "Invalid email format"}), 400
+
         result = supabase.table("users").insert({
             "email": email, 
             "password": password
         }).execute()
+
+        if hasattr(result, 'error') and result.error:
+            return jsonify({"error": str(result.error)}), 400
 
         return jsonify({
             "message": "User registered successfully",
@@ -60,5 +67,8 @@ def register():
         print(f"Error in /register: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
-# Jangan jalankan app langsung di production
-# Biarkan gunicorn yang menangani
+if __name__ == "__main__":
+    # Untuk development saja
+    # Di production, gunicorn akan menangani
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)

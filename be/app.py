@@ -3,31 +3,27 @@ from flask_cors import CORS
 from supabase import create_client, Client
 import os
 
+# Inisialisasi aplikasi
 app = Flask(__name__)
 CORS(app)
 
-# Gunakan environment variables
+# Environment variables
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 
-print("=== Checking Environment Variables ===")
-print(f"PORT: {os.environ.get('PORT')}")
-print(f"SUPABASE_URL exists: {SUPABASE_URL is not None}")
-print(f"SUPABASE_KEY exists: {SUPABASE_KEY is not None}")
-
+# Initialize Supabase client
 if SUPABASE_URL and SUPABASE_KEY:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    print("Supabase client initialized successfully")
+    print("✅ Supabase client initialized")
 else:
-    print("ERROR: Missing Supabase environment variables")
+    print("❌ Supabase environment variables missing")
     supabase = None
 
 @app.route("/")
 def home():
     return jsonify({
         "message": "Flask Render deployment works!",
-        "status": "success",
-        "supabase_configured": SUPABASE_URL is not None and SUPABASE_KEY is not None
+        "status": "success"
     })
 
 @app.route("/health")
@@ -41,7 +37,6 @@ def register():
             return jsonify({"error": "Database not configured"}), 500
             
         data = request.get_json()
-        
         if not data:
             return jsonify({"error": "No data provided"}), 400
             
@@ -65,7 +60,5 @@ def register():
         print(f"Error in /register: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
-# Hapus block ini untuk production, atau pastikan debug=False
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=False)  # debug=False untuk production
+# Jangan jalankan app langsung di production
+# Biarkan gunicorn yang menangani
